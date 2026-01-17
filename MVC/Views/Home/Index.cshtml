@@ -1,4 +1,4 @@
-﻿﻿@model HomeIndexPageModel
+﻿@model HomeIndexPageModel
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -20,16 +20,8 @@
 
 
 <hr />
-
 <h3>
-    @if (Model.SearchForm.CategoryId.HasValue)
-    {
-        <span>@Model.Categories.FirstOrDefault(c => c.Id == Model.SearchForm.CategoryId)?.Name</span>
-    }
-    else
-    {
-        <span>All Products</span>
-    }
+    @ViewBag.ListTitle
 </h3>
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">

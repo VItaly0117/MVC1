@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<StoreContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlite(connectionString));
 
 // 2. Add Identity with custom settings
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
@@ -49,12 +49,24 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
     var roles = new[] { RoleConstants.Admin, RoleConstants.Manager };
+    var userManager = services.GetRequiredService<UserManager<User>>();
 
     foreach (var roleName in roles)
     {
         if (!await roleManager.RoleExistsAsync(roleName))
         {
             await roleManager.CreateAsync(new IdentityRole<int>(roleName));
+        }
+    }
+    
+    // Seed Admin User if no users exist
+    if (!userManager.Users.Any())
+    {
+        var adminUser = new User { UserName = "admin@example.com", Email = "admin@example.com", FullName = "Admin Owner", EmailConfirmed = true };
+        var result = await userManager.CreateAsync(adminUser, "123"); // Simple password for development
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, RoleConstants.Admin);
         }
     }
 }
