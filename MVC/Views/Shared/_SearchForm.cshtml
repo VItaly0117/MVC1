@@ -1,0 +1,6 @@
+﻿@model HomePageSearchForm
+
+<form asp-controller="Home" asp-action="Index" method="get" class="d-flex">
+    <input asp-for="Query" class="form-control me-2" type="search" placeholder="Search products..." aria-label="Search">
+    <button class="btn btn-outline-success" type="submit">Search</button>
+</form>

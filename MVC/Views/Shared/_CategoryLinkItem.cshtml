@@ -1,0 +1,8 @@
+﻿@model Category
+
+<div class="col text-center">
+    <a asp-controller="Home" asp-action="Index" asp-route-categoryId="@Model.Id" class="text-decoration-none category-link">
+        <img src="@(Model.Image?.Src ?? "/images/placeholder.png")" class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;" alt="@Model.Name"/>
+        <h6 class="text-dark">@Model.Name</h6>
+    </a>
+</div>

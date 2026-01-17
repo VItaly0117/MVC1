@@ -1,0 +1,15 @@
+﻿@model IEnumerable<ImageUploaded>
+
+<div class="row">
+    @foreach (var image in Model)
+    {
+        <div class="col-md-3 mb-3" id="image-container-@image.Id">
+            <div class="card">
+                <img src="@image.Src" class="card-img-top" style="height: 150px; object-fit: cover;" />
+                <div class="card-footer text-center">
+                    <button type="button" class="btn btn-sm btn-danger delete-image-btn" data-image-id="@image.Id">Delete</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

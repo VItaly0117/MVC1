@@ -1,0 +1,46 @@
+﻿html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  background-color: #f8f9fa;
+}
+
+/* Card styles */
+.card {
+    transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+    border: none;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Category link styles */
+.category-link img {
+    transition: transform .2s ease-in-out;
+}
+
+.category-link:hover img {
+    transform: scale(1.1);
+}
+
+/* Cart badge */
+#cart-link .badge {
+    font-size: 0.7em;
+    vertical-align: top;
+    margin-left: -5px;
+}

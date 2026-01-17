@@ -1,0 +1,16 @@
+﻿@model Product
+
+<div class="card h-100">
+    <a asp-controller="Home" asp-action="Product" asp-route-id="@Model.Id">
+        <img src="@(Model.Images.FirstOrDefault()?.Src ?? "/images/placeholder.png")" class="card-img-top" alt="@Model.Name">
+    </a>
+    <div class="card-body d-flex flex-column">
+        <h5 class="card-title">
+            <a asp-controller="Home" asp-action="Product" asp-route-id="@Model.Id" class="text-decoration-none">@Model.Name</a>
+        </h5>
+        <p class="card-text">@Model.Price.ToString("C")</p>
+        <div class="mt-auto">
+            <button class="btn btn-primary add-to-cart" data-product-id="@Model.Id">Add to cart</button>
+        </div>
+    </div>
+</div>
