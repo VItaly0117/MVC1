@@ -1,4 +1,4 @@
-﻿﻿﻿using System.Diagnostics;
+﻿﻿﻿﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC.Models;
@@ -20,6 +20,7 @@ public class HomeController : Controller
     {
         var productsQuery = _context.Products
             .Include(p => p.Images)
+            .AsSplitQuery()
             .AsQueryable();
 
         // Сначала получаем все категории

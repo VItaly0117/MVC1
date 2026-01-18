@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC.Models;
@@ -77,6 +77,7 @@ public class CartController : Controller
         {
             cart = await _context.Carts
                 .Include(c => c.Items).ThenInclude(i => i.Product).ThenInclude(p => p.Images)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.UserId == user.Id);
         }
 
@@ -84,6 +85,7 @@ public class CartController : Controller
         {
             cart = await _context.Carts
                 .Include(c => c.Items).ThenInclude(i => i.Product).ThenInclude(p => p.Images)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.UniqueId == cartId);
         }
 

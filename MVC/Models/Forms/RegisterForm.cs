@@ -9,8 +9,10 @@ public class RegisterForm
     [Display(Name = "Email")]
     public string Email { get; set; } = string.Empty;
 
+    // Вот это поле вызывает ошибку, если его нет
     [Required]
     [Display(Name = "Full Name")]
+    [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
     public string FullName { get; set; } = string.Empty;
 
     [Required]

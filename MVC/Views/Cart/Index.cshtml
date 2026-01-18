@@ -1,0 +1,53 @@
+@model Cart
+
+@{
+    ViewData["Title"] = "Shopping Cart";
+    var total = Model?.Items.Sum(i => i.Product.Price * i.Quantity) ?? 0;
+}
+
+<h1>Shopping Cart</h1>
+
+@if (Model == null || !Model.Items.Any())
+{
+    <div class="alert alert-info">
+        Your cart is empty.
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Product</th>
+            <th class="text-end">Price</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-end">Subtotal</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>
+                    <img src="@(item.Product.Images.FirstOrDefault()?.Src ?? "/images/placeholder.png")" style="width: 75px; height: 75px; object-fit: cover;" alt="@item.Product.Name"/>
+                </td>
+                <td>@item.Product.Name</td>
+                <td class="text-end">@item.Product.Price.ToString("C")</td>
+                <td class="text-center">@item.Quantity</td>
+                <td class="text-end">@((item.Product.Price * item.Quantity).ToString("C"))</td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="4" class="text-end"><strong>Total</strong></td>
+            <td class="text-end"><strong>@total.ToString("C")</strong></td>
+        </tr>
+        </tfoot>
+    </table>
+
+    <div class="text-end">
+        <a href="#" class="btn btn-primary">Proceed to Checkout</a>
+    </div>
+}

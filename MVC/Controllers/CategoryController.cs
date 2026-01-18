@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC.Models;
@@ -7,7 +7,7 @@ using MVC.Models.Services;
 
 namespace MVC.Controllers;
 
-[Authorize(Roles = RoleConstants.Manager)]
+[Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Manager}")]
 public class CategoryController : Controller
 {
     private readonly StoreContext _context;

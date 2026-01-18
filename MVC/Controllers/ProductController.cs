@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +8,7 @@ using MVC.Models.Services;
 
 namespace MVC.Controllers;
 
-[Authorize(Roles = RoleConstants.Manager)]
+[Authorize(Roles = $"{RoleConstants.Admin},{RoleConstants.Manager}")]
 public class ProductController : Controller
 {
     private readonly StoreContext _context;
