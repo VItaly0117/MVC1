@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC.Models;
@@ -60,6 +60,27 @@ public class CartController : Controller
         return Ok();
     }
     
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> PlaceOrderForItem(int id)
+    {
+        var cart = await GetCartAsync();
+        var cartItem = cart.Items.FirstOrDefault(i => i.Id == id);
+
+        if (cartItem == null)
+        {
+            return NotFound();
+        }
+
+        // "Оплачиваем" товар, помечая его как заказанный
+        cartItem.IsOrdered = true;
+        await _context.SaveChangesAsync();
+
+        TempData["SuccessMessage"] = $"Order placed for {cartItem.Product.Name}!";
+
+        return RedirectToAction(nameof(Index));
+    }
+    
     [HttpGet]
     public async Task<IActionResult> Count()
     {
@@ -70,44 +91,55 @@ public class CartController : Controller
 
     private async Task<Cart> GetCartAsync()
     {
-        Cart? cart = null;
         var user = await _userManager.GetUserAsync(User);
 
+        // --- Logic for Logged-in Users ---
         if (user != null)
         {
-            cart = await _context.Carts
+            // Find a cart specifically for this user.
+            var userCart = await _context.Carts
                 .Include(c => c.Items).ThenInclude(i => i.Product).ThenInclude(p => p.Images)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+            // If the user doesn't have a cart, create one for them.
+            if (userCart == null)
+            {
+                userCart = new Cart { UserId = user.Id };
+                _context.Carts.Add(userCart);
+                await _context.SaveChangesAsync();
+            }
+            return userCart;
         }
 
-        if (cart == null && Request.Cookies.TryGetValue(CartCookieName, out var cartIdStr) && Guid.TryParse(cartIdStr, out var cartId))
+        // --- Logic for Guests ---
+        Cart? guestCart = null;
+        if (Request.Cookies.TryGetValue(CartCookieName, out var cartIdStr) && Guid.TryParse(cartIdStr, out var cartId))
         {
-            cart = await _context.Carts
+            // Find the guest cart by its unique ID from the cookie.
+            // Important: Also check that it's not associated with any user.
+            guestCart = await _context.Carts
                 .Include(c => c.Items).ThenInclude(i => i.Product).ThenInclude(p => p.Images)
                 .AsSplitQuery()
-                .FirstOrDefaultAsync(c => c.UniqueId == cartId);
+                .FirstOrDefaultAsync(c => c.UniqueId == cartId && c.UserId == null);
         }
 
-        if (cart == null)
+        // If no valid guest cart is found, create a new one.
+        if (guestCart == null)
         {
-            cart = new Cart();
-            _context.Carts.Add(cart);
-        }
-
-        if (user != null && cart.UserId == null)
-        {
-            cart.UserId = user.Id;
+            guestCart = new Cart(); // This cart has no UserId.
+            _context.Carts.Add(guestCart);
             await _context.SaveChangesAsync();
         }
 
-        Response.Cookies.Append(CartCookieName, cart.UniqueId.ToString(), new CookieOptions
+        // Set/update the cookie for the guest.
+        Response.Cookies.Append(CartCookieName, guestCart.UniqueId.ToString(), new CookieOptions
         {
             Expires = DateTime.Now.AddDays(30),
             HttpOnly = true,
             IsEssential = true
         });
 
-        return cart;
+        return guestCart;
     }
 }

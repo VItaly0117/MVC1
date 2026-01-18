@@ -1,0 +1,62 @@
+﻿@model Product
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        @if (Model.Images.Any())
+        {
+            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner rounded">
+                    @for (int i = 0; i < Model.Images.Count; i++)
+                    {
+                        var image = Model.Images.ElementAt(i);
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <img src="@image.Src" class="d-block w-100" style="height: 450px; object-fit: cover;" alt="@Model.Name">
+                        </div>
+                    }
+                </div>
+                @if (Model.Images.Count > 1)
+                {
+                    <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                }
+            </div>
+        }
+        else
+        {
+            <img src="https://via.placeholder.com/600x450.png?text=Regie+Shop" class="img-fluid rounded" style="height: 450px; width: 100%; object-fit: cover;" alt="No Image Available">
+        }
+    </div>
+    <div class="col-md-6">
+        <h4 class="text-body-secondary">@Model.Category.Name</h4>
+        <h1>@Model.Name</h1>
+        <p class="lead">@Model.Description</p>
+        
+        <div class="mb-3">
+            @foreach (var tag in Model.Tags)
+            {
+                <span class="badge text-bg-secondary me-1">@tag.Name</span>
+            }
+        </div>
+        
+        <h2 class="my-4">@Model.Price.ToString("C0")</h2>
+        
+        <p class="text-muted">In Stock: @Model.Quantity</p>
+        
+        <div class="d-flex align-items-center mt-4">
+            <div class="input-group" style="max-width: 300px;">
+                <input type="number" class="form-control product-quantity" value="1" min="1" max="@Model.Quantity" aria-label="Product quantity">
+                <button class="btn btn-primary btn-lg add-to-cart" data-product-id="@Model.Id" data-product-name="@Model.Name" type="button">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+</div>

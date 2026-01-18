@@ -1,21 +1,28 @@
 @model Cart
 
 @{
-    ViewData["Title"] = "Shopping Cart";
-    var total = Model?.Items.Sum(i => i.Product.Price * i.Quantity) ?? 0;
+    ViewData["Title"] = "Shopping Cart & Orders";
+    var inCartItems = Model?.Items.Where(i => !i.IsOrdered).ToList() ?? new List<CartItem>();
+    var orderedItems = Model?.Items.Where(i => i.IsOrdered).OrderByDescending(i => i.Id).ToList() ?? new List<CartItem>();
+    var cartTotal = inCartItems.Sum(i => i.Product.Price * i.Quantity);
 }
 
-<h1>Shopping Cart</h1>
-
-@if (Model == null || !Model.Items.Any())
+@if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-info">
-        Your cart is empty.
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<!-- Секция для товаров в корзине -->
+<h1 class="display-6">Shopping Cart</h1>
+@if (!inCartItems.Any())
+{
+    <div class="alert alert-secondary">
+        Your shopping cart is empty.
     </div>
 }
 else
 {
-    <table class="table">
+    <table class="table align-middle">
         <thead>
         <tr>
             <th></th>
@@ -23,31 +30,69 @@ else
             <th class="text-end">Price</th>
             <th class="text-center">Quantity</th>
             <th class="text-end">Subtotal</th>
+            <th></th> <!-- Для кнопки заказа -->
         </tr>
         </thead>
         <tbody>
-        @foreach (var item in Model.Items)
+        @foreach (var item in inCartItems)
         {
             <tr>
                 <td>
-                    <img src="@(item.Product.Images.FirstOrDefault()?.Src ?? "/images/placeholder.png")" style="width: 75px; height: 75px; object-fit: cover;" alt="@item.Product.Name"/>
+                    <img src="@(item.Product.Images.FirstOrDefault()?.Src ?? "https://via.placeholder.com/150?text=Regie+Shop")" style="width: 75px; height: 75px; object-fit: cover;" alt="@item.Product.Name"/>
                 </td>
                 <td>@item.Product.Name</td>
-                <td class="text-end">@item.Product.Price.ToString("C")</td>
+                <td class="text-end">@item.Product.Price.ToString("C0")</td>
                 <td class="text-center">@item.Quantity</td>
-                <td class="text-end">@((item.Product.Price * item.Quantity).ToString("C"))</td>
+                <td class="text-end">@((item.Product.Price * item.Quantity).ToString("C0"))</td>
+                <td class="text-end">
+                    <form asp-controller="Cart" asp-action="PlaceOrderForItem" asp-route-id="@item.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-success">Place Order</button>
+                    </form>
+                </td>
             </tr>
         }
         </tbody>
         <tfoot>
         <tr>
-            <td colspan="4" class="text-end"><strong>Total</strong></td>
-            <td class="text-end"><strong>@total.ToString("C")</strong></td>
+            <td colspan="5" class="text-end"><strong>Total</strong></td>
+            <td class="text-end"><strong>@cartTotal.ToString("C0")</strong></td>
         </tr>
         </tfoot>
     </table>
 
     <div class="text-end">
-        <a href="#" class="btn btn-primary">Proceed to Checkout</a>
+        <a asp-controller="Checkout" asp-action="Index" class="btn btn-primary">Proceed to Checkout All Items</a>
     </div>
+}
+
+<!-- Секция для оплаченных товаров -->
+@if (orderedItems.Any())
+{
+    <h2 class="display-6 mt-5">Paid - Awaiting Shipment</h2>
+    <table class="table align-middle">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Product</th>
+            <th class="text-end">Price</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-end">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in orderedItems)
+        {
+            <tr class="opacity-75">
+                <td>
+                    <img src="@(item.Product.Images.FirstOrDefault()?.Src ?? "https://via.placeholder.com/150?text=Regie+Shop")" style="width: 75px; height: 75px; object-fit: cover;" alt="@item.Product.Name"/>
+                </td>
+                <td>@item.Product.Name</td>
+                <td class="text-end">@item.Product.Price.ToString("C0")</td>
+                <td class="text-center">@item.Quantity</td>
+                <td class="text-end"><span class="badge bg-info">Awaiting Shipment</span></td>
+            </tr>
+        }
+        </tbody>
+    </table>
 }

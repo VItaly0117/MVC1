@@ -1,0 +1,50 @@
+﻿@model UserProfileForm
+
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Current Avatar</label>
+                <div>
+                    <img src="@(ViewBag.AvatarSrc ?? "https://via.placeholder.com/150?text=No+Avatar")" alt="Avatar" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;"/>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Avatar" class="form-label">Change Avatar</label>
+                <input asp-for="Avatar" class="form-control" />
+                <span asp-validation-for="Avatar" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <h4>Manage</h4>
+        <hr />
+        <a asp-action="ChangePassword" class="btn btn-outline-secondary">Change Password</a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

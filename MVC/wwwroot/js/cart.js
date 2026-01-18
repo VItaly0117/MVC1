@@ -1,12 +1,29 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+﻿const Toast = Swal.mixin({
+    toast: true,
+    position: 'bottom-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    background: '#343a40', // Bootstrap dark background
+    color: '#f8f9fa',      // Bootstrap light text
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
     updateCartItemCount();
 
     document.body.addEventListener('click', function (e) {
-        if (e.target.classList.contains('add-to-cart')) {
-            const button = e.target;
+        const button = e.target.closest('.add-to-cart');
+        if (button) {
             const productId = button.dataset.productId;
+            const productName = button.dataset.productName;
+            const quantityInput = button.closest('.input-group').querySelector('.product-quantity');
+            const quantity = parseInt(quantityInput.value, 10) || 1;
             
-            addToCart(productId);
+            addToCart(productId, quantity, productName);
         }
     });
 });
@@ -24,24 +41,33 @@ function updateCartItemCount() {
         .catch(error => console.error('Unable to get cart count.', error));
 }
 
-function addToCart(productId) {
+function addToCart(productId, quantity, productName) {
     fetch('/Cart/Add', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ productId: productId, quantity: 1 })
+        body: JSON.stringify({ productId: productId, quantity: quantity })
     })
     .then(response => {
         if (response.ok) {
             updateCartItemCount();
-            Swal.fire('Added!', 'Product has been added to your cart.', 'success');
+            Toast.fire({
+                icon: 'success',
+                title: `${quantity}x ${productName || 'Item'} added to cart!`
+            });
         } else {
-            Swal.fire('Error!', 'Could not add product to cart.', 'error');
+            Toast.fire({
+                icon: 'error',
+                title: 'Could not add product'
+            });
         }
     })
     .catch(error => {
         console.error('Error adding to cart:', error);
-        Swal.fire('Error!', 'An unexpected error occurred.', 'error');
+        Toast.fire({
+            icon: 'error',
+            title: 'An unexpected error occurred'
+        });
     });
 }

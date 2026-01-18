@@ -1,4 +1,4 @@
-﻿﻿namespace MVC.Models;
+﻿namespace MVC.Models;
 
 public class CartItem
 {
@@ -8,4 +8,5 @@ public class CartItem
     public int ProductId { get; set; }
     public Product Product { get; set; } = null!;
     public int Quantity { get; set; }
+    public bool IsOrdered { get; set; } = false;
 }

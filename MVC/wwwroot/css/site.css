@@ -16,6 +16,8 @@ html {
 body {
   margin-bottom: 60px;
   background-color: #212529;
+  font-family: 'Inter', sans-serif;
+  color: #dee2e6; /* A slightly brighter default text color for dark mode */
 }
 
 /* Card styles */

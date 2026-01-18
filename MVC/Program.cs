@@ -51,7 +51,6 @@ using (var scope = app.Services.CreateScope())
     var roles = new[] { RoleConstants.Admin, RoleConstants.Manager };
     var userManager = services.GetRequiredService<UserManager<User>>();
     var context = services.GetRequiredService<StoreContext>();
-    await context.Database.EnsureCreatedAsync();
 
     foreach (var roleName in roles)
     {
